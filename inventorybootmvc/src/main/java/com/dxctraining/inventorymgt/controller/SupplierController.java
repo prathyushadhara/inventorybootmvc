@@ -1,24 +1,28 @@
 package com.dxctraining.inventorymgt.controller;
 
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.dxctraining.inventorymgt.dto.SessionData;
 import com.dxctraining.inventorymgt.supplier.entities.Supplier;
 import com.dxctraining.inventorymgt.supplier.service.ISupplierService;
 
 import java.util.*;
 
-import javax.annotation.PostConstruct;
 
 @Controller
 public class SupplierController {
 
     @Autowired
     private ISupplierService supplierservice;
+    @Autowired
+    private SessionData sessionData;
+
 
     
   /*  @PostConstruct
@@ -61,12 +65,27 @@ public class SupplierController {
 		return mv;
 	}
 
-	@GetMapping("/processlogin")
-	public ModelAndView processLogin(@RequestParam("name") String name, @RequestParam("id") int id) {
-		Supplier supplier = supplierservice.findSupplierById(id);
-		ModelAndView mv = new ModelAndView("details", "supplier", supplier);
-		return mv;
-	}
+	 @GetMapping("/processlogin")
+	    public ModelAndView processLogin(@RequestParam("id") int id, @RequestParam("password") String password){
+	         boolean correct=supplierservice.authenticate(id,password);
+	         if(!correct){
+	          ModelAndView modelAndView= new ModelAndView("login");
+	          return modelAndView;
+	         }
+	         sessionData.saveLogin(id);
+	         Supplier sup=supplierservice.findSupplierById(id);
+	         ModelAndView modelAndView=new ModelAndView("details","supplier",sup);
+	         return modelAndView;
+	    }
+
+	    @GetMapping("/logout")
+	    public ModelAndView logout(){
+	       sessionData.clear();
+	       ModelAndView modelAndView=new ModelAndView("login");
+	       return modelAndView;
+	    }
+
+	
 
 }
 

@@ -10,5 +10,7 @@ public interface ISupplierService {
 	void remove(int id);
 	List<Supplier> displayAllSuppliers();
 
+    boolean authenticate(int id, String password);
+
 
 }
